@@ -37,8 +37,9 @@ app.post('/login', (req,res) => {
              if(user.country === country) {
                  res.send({success: true, message: 'Success'})
              } else {
-                 let text = "It seems you have changed your location. To approve it's you, please click to this link";
-                 utils.sendMail(user.email,'Recovery Email', text);
+                 let text = "It seems you have changed your location. To approve it's you, please click to this link: ";
+                 let url = 'some link that will be clicked in client side and will work "/recover/country" put request';
+                 utils.sendMail(user.email,'Recovery Email', text + url);
                  res.send({success:false, message: 'Check your email. It seems you have changed your location '})
              }
          }).catch(err => {
@@ -48,6 +49,18 @@ app.post('/login', (req,res) => {
 });
 
 
-app.listen(5678, () => {
-    console.log('Example app listening on port 5678!');
+app.put('/recover/country', (req,res) => {
+    ipstack(req.ip, ipstack_APIKey, (err, response) => {
+        let country = (response && response.country_name) ? response.country_name : 'Unknown';
+        users.updateOne({username: req.body.username, password: req.body.password},{$set: {country: country}}).then(result => {
+            res.json({status:true, message: 'Geolocation updated'})
+        }).catch(err => {
+            res.json({status:false, message: 'Something went wrong'})
+        })
+
+    })
+});
+
+app.listen(1234, () => {
+    console.log('Example app listening on port 1234!');
 });
