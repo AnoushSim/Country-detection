@@ -1,7 +1,14 @@
 const mongoose = require('mongoose');
+const shortid = require('shortid');
 
-
+function generateAPIKey () {
+    return shortid.generate() + '-' + shortid.generate() + '-' + shortid.generate() ;
+}
 const UsersSchema = new mongoose.Schema({
+    key: {
+        type: String,
+        default: generateAPIKey
+    },
     username:{
         type: String,
         unique: true
